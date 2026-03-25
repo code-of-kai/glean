@@ -1,6 +1,6 @@
 ---
 name: glean
-description: Scrape web pages to clean Markdown. Fast, concurrent, text-only.
+description: Scrapes web pages to clean Markdown. Fast, concurrent, text-only.
 ---
 
 # Glean
