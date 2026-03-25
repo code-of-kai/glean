@@ -12,11 +12,35 @@ Fast, text-only web scraper that extracts main content as clean Markdown. Built 
 - Crawls entire sites concurrently with **smart link filtering** — skips junk pages like /contact, /about, /login
 - Fetches up to **20 pages simultaneously** using BEAM processes
 
-## Requirements
+## Install
 
-- [Elixir](https://elixir-lang.org/install.html) 1.15+ (uses `Mix.install` for zero-setup dependencies)
+**Prerequisite:** [Elixir](https://elixir-lang.org/install.html) 1.15+
 
-That's it. No `mix deps.get`, no project setup. Dependencies (`Req` and `Floki`) are fetched and cached automatically on first run.
+```bash
+# Download and run
+curl -fsSL https://raw.githubusercontent.com/code-of-kai/glean/main/glean.exs -o glean.exs
+elixir glean.exs https://example.com
+```
+
+Or clone the repo:
+
+```bash
+git clone https://github.com/code-of-kai/glean.git
+cd glean
+elixir glean.exs https://example.com
+```
+
+That's it — one file, no `mix deps.get`, no project setup. Dependencies (`Req` and `Floki`) are fetched and cached automatically on first run.
+
+### As a Claude Code skill
+
+```bash
+mkdir -p ~/.claude/skills/glean
+curl -fsSL https://raw.githubusercontent.com/code-of-kai/glean/main/glean.exs -o ~/.claude/skills/glean/glean.exs
+curl -fsSL https://raw.githubusercontent.com/code-of-kai/glean/main/SKILL.md -o ~/.claude/skills/glean/SKILL.md
+```
+
+Then use `/glean` in Claude Code, or just ask Claude to scrape a page — it triggers automatically.
 
 ## Usage
 
@@ -111,19 +135,6 @@ The extraction pipeline:
 - **JavaScript-rendered pages**: Cannot scrape SPAs or pages that require JS execution (React/Vue apps without SSR). For these, use a browser-based tool.
 - **Paywalled content**: Cannot bypass login walls or paywalls.
 - **Images/media**: Intentionally excluded — this is a text-only tool by design.
-
-## Use as a Claude Code skill
-
-Glean was built as a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill. To install it:
-
-```bash
-# Copy to your Claude Code skills directory
-mkdir -p ~/.claude/skills/glean
-cp glean.exs ~/.claude/skills/glean/
-cp SKILL.md ~/.claude/skills/glean/
-```
-
-Then Claude can use it via the `/glean` slash command, or it will be triggered automatically when you ask Claude to scrape a web page.
 
 ## License
 
