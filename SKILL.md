@@ -1,6 +1,6 @@
 ---
 name: glean
-description: Fast Elixir web scraper that extracts main text content from URLs as clean Markdown. Strips navigation, sidebars, ads, and images. Preserves headings, bold, italic, and list formatting. Supports crawling all subpages concurrently with smart link filtering.
+description: Scrape web pages to clean Markdown. Fast, concurrent, text-only.
 ---
 
 # Glean
