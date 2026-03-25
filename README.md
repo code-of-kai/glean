@@ -1,38 +1,12 @@
 # Glean
 
-Fast, text-only web scraper that extracts main content as clean Markdown. Built in Elixir for concurrent page fetching via BEAM lightweight processes.
+A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill for fast web scraping. Extracts main page content as clean Markdown — no sidebars, no ads, no images, just the text.
 
-**Single file. No project setup. Just run it.**
-
-## What it does
-
-- Extracts the **main content** from web pages (articles, blog posts, docs)
-- Strips navigation, sidebars, footers, ads, and images automatically
-- Outputs clean **Markdown** with headings, bold, italic, lists, code blocks, and blockquotes preserved
-- Crawls entire sites concurrently with **smart link filtering** — skips junk pages like /contact, /about, /login
-- Fetches up to **20 pages simultaneously** using BEAM processes
+Built as a single Elixir script. Uses BEAM lightweight processes to fetch up to 20 pages concurrently.
 
 ## Install
 
 **Prerequisite:** [Elixir](https://elixir-lang.org/install.html) 1.15+
-
-```bash
-# Download and run
-curl -fsSL https://raw.githubusercontent.com/code-of-kai/glean/main/glean.exs -o glean.exs
-elixir glean.exs https://example.com
-```
-
-Or clone the repo:
-
-```bash
-git clone https://github.com/code-of-kai/glean.git
-cd glean
-elixir glean.exs https://example.com
-```
-
-That's it — one file, no `mix deps.get`, no project setup. Dependencies (`Req` and `Floki`) are fetched and cached automatically on first run.
-
-### As a Claude Code skill
 
 ```bash
 mkdir -p ~/.claude/skills/glean
@@ -40,41 +14,36 @@ curl -fsSL https://raw.githubusercontent.com/code-of-kai/glean/main/glean.exs -o
 curl -fsSL https://raw.githubusercontent.com/code-of-kai/glean/main/SKILL.md -o ~/.claude/skills/glean/SKILL.md
 ```
 
-Then use `/glean` in Claude Code, or just ask Claude to scrape a page — it triggers automatically.
+That's it. Use `/glean` in Claude Code, or just ask Claude to scrape a page — it triggers automatically.
 
-## Usage
+Dependencies (`Req` and `Floki`) are fetched and cached by Elixir on first run. No `mix deps.get`, no project setup.
 
-### Single page
+## What it does
+
+- Extracts the **main content** from web pages (articles, blog posts, docs)
+- Strips navigation, sidebars, footers, ads, and images automatically
+- Outputs clean **Markdown** preserving headings, bold, italic, lists, code blocks, and blockquotes
+- Crawls entire sites concurrently with **smart link filtering** — skips junk pages like /contact, /about, /login
+- Fetches up to **20 pages simultaneously** using BEAM processes
+
+## Standalone usage
+
+The script also works outside Claude Code as a regular CLI tool:
 
 ```bash
+# Single page
 elixir glean.exs https://example.com/article
-```
 
-### Multiple pages (fetched concurrently)
+# Multiple pages (fetched concurrently)
+elixir glean.exs https://example.com/page1 https://example.com/page2
 
-```bash
-elixir glean.exs https://example.com/page1 https://example.com/page2 https://example.com/page3
-```
-
-### Crawl a site
-
-Discovers content links on the page and scrapes them all concurrently:
-
-```bash
+# Crawl a site — discovers content links and scrapes them all
 elixir glean.exs --crawl https://example.com/blog
-```
 
-### Crawl with a pattern filter
-
-Only follow links whose path contains a specific string:
-
-```bash
+# Crawl with a pattern filter
 elixir glean.exs --crawl --pattern "/essays/" https://paulgraham.com/articles.html
-```
 
-### Save output to a file
-
-```bash
+# Save to file
 elixir glean.exs https://example.com/article > article.md
 ```
 
@@ -100,12 +69,12 @@ When `--crawl` is used, Glean doesn't just grab every link on the page. It filte
 
 If the content area yields zero links (e.g. the page has no semantic HTML), it falls back to all same-domain links with the junk filter still applied.
 
-## Output format
+## Output
 
-- **Single URL**: Markdown text printed to stdout
+- **Single URL**: Markdown to stdout
 - **Multiple URLs**: Each result separated by `--- <url> ---` headers
-- **Crawl stats**: Printed to stderr (total links, content-area links, after filtering)
-- **Errors**: Printed to stderr; the script continues with remaining URLs
+- **Crawl stats**: Printed to stderr
+- **Errors**: Printed to stderr; continues with remaining URLs
 
 ## Performance
 
@@ -117,24 +86,19 @@ If the content area yields zero links (e.g. the page has no semantic HTML), it f
 
 ## How it works
 
-Glean is a single Elixir script (`glean.exs`) that uses `Mix.install` for zero-setup dependency management:
+A single Elixir script (`glean.exs`) using `Mix.install` for zero-setup dependency management:
 
-- **[Req](https://hex.pm/packages/req)** — HTTP client for fetching pages
-- **[Floki](https://hex.pm/packages/floki)** — HTML parser for content extraction and link discovery
-- **Task.async_stream** — BEAM's built-in concurrency for parallel page fetching
+- **[Req](https://hex.pm/packages/req)** — HTTP client
+- **[Floki](https://hex.pm/packages/floki)** — HTML parser
+- **Task.async_stream** — BEAM's built-in concurrency
 
-The extraction pipeline:
-
-1. Parse HTML with Floki
-2. Find the main content container (`<article>`, `<main>`, `[role=main]`, common CSS classes)
-3. Strip unwanted elements (nav, footer, header, aside, scripts, styles, forms)
-4. Walk the DOM tree and convert to Markdown, preserving semantic formatting
+The extraction pipeline: parse HTML, find the main content container, strip unwanted elements (nav, footer, scripts, etc.), walk the DOM tree, convert to Markdown.
 
 ## Limitations
 
-- **JavaScript-rendered pages**: Cannot scrape SPAs or pages that require JS execution (React/Vue apps without SSR). For these, use a browser-based tool.
-- **Paywalled content**: Cannot bypass login walls or paywalls.
-- **Images/media**: Intentionally excluded — this is a text-only tool by design.
+- **JS-rendered pages**: Cannot scrape SPAs or pages requiring JavaScript (React/Vue without SSR)
+- **Paywalled content**: Cannot bypass login walls
+- **Images/media**: Intentionally excluded — text only by design
 
 ## License
 
